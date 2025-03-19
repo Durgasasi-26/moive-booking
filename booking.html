@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieBuzz</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            min-height: 100vh;
+            color: white;
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .header {
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            background: linear-gradient(to bottom, rgb(77, 73, 73), transparent);
+            max-width: 800px;
+            border-radius: 30px;
+            margin: 2rem auto;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .screen {
+            background: linear-gradient(to bottom, #e50914, transparent);
+            height: 100px;
+            width: 100%;
+            margin: 2rem 0;
+            transform: perspective(500px) rotateX(-30deg);
+            box-shadow: 0 3px 10px rgba(255, 255, 255, 0.1);
+        }
+
+        .seats-container {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .seat {
+            width: 30px;
+            height: 30px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .seat:hover:not(.occupied) {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .seat.selected {
+            background-color: #4CAF50;
+        }
+
+        .seat.occupied {
+            background-color: #ff0000;
+            cursor: not-allowed;
+        }
+
+        .booking-summary {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 2rem auto;
+            max-width: 400px;
+        }
+
+        .booking-summary h3 {
+            margin-bottom: 1rem;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.5rem 0;
+            padding: 0.5rem 0;
+        }
+
+        .checkout-btn {
+            background-color: #e50914;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1rem;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .checkout-btn:hover {
+            background-color: #ff0f1f;
+        }
+
+        .checkout-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .payment-form {
+            display: none;
+            margin-top: 2rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+
+        .payment-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 5px;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1rem 0;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .discount {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        /* Mobile Styles for Booking Page */
+        @media screen and (max-width: 768px) {
+            .header {
+                padding: 0.5rem;
+            }
+
+            .logo {
+                font-size: 2rem;
+            }
+
+            .container {
+                max-width: 100%;
+                padding: 0.5rem;
+                margin: 0.5rem;
+            }
+
+            .screen {
+                height: 60px;
+                margin: 1rem 0;
+            }
+
+            .seats-container {
+                grid-template-columns: repeat(8, 1fr);
+                gap: 0.5rem;
+                padding: 0.5rem;
+            }
+
+            .seat {
+                width: 25px;
+                height: 25px;
+            }
+
+            .legend {
+                gap: 0.8rem;
+                flex-wrap: wrap;
+                margin: 0.5rem 0;
+            }
+
+            .legend-item {
+                font-size: 0.9rem;
+            }
+
+            .booking-summary {
+                margin: 1rem auto;
+                padding: 1rem;
+                width: 90%;
+            }
+
+            .summary-row {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <h1 class="logo">MovieBuzz</h1>
+    </header>
+
+    <div class="container">
+        <div id="bookingInfo"></div>
+        <div class="screen"></div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-box" style="background: rgba(255,255,255,0.2);"></div>
+                <span>Available</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #4CAF50;"></div>
+                <span>Selected</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #ff0000;">
+                    <i class="fas fa-times"></i>
+                </div>
+                <span>Occupied</span>
+            </div>
+        </div>
+
+        <div class="seats-container" id="seatsContainer"></div>
+
+        <div class="booking-summary">
+            <h3>Booking Summary</h3>
+            <div class="summary-row">
+                <span>Selected Seats:</span>
+                <span id="selectedSeatsCount">0</span>
+            </div>
+            <div class="summary-row">
+                <span>Price per ticket:</span>
+                <span>₹250</span>
+            </div>
+            <div class="summary-row">
+                <span>Subtotal:</span>
+                <span id="subtotalPrice">₹0</span>
+            </div>
+            <div class="summary-row">
+                <span>Discount (10%):</span>
+                <span id="discount" class="discount">-₹0</span>
+            </div>
+            <div class="summary-row" style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 1rem;">
+                <span><strong>Total Price:</strong></span>
+                <span id="totalPrice"><strong>₹0</strong></span>
+            </div>
+            <button class="checkout-btn" onclick="showPaymentForm()" id="proceedBtn" disabled>Proceed to
+                Payment</button>
+        </div>
+
+        <script>
+            const TICKET_PRICE = 250;
+            let selectedSeats = [];
+
+            function checkBookingFlow() {
+                const city = localStorage.getItem('selectedCity');
+                const movieId = localStorage.getItem('selectedMovie');
+                const theatreId = localStorage.getItem('selectedTheatre');
+                const showtime = localStorage.getItem('selectedShowtime');
+
+                if (!city || !movieId || !theatreId || !showtime) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                displayBookingInfo();
+                renderSeats();
+            }
+
+            function displayBookingInfo() {
+                const movieId = localStorage.getItem('selectedMovie');
+                const city = localStorage.getItem('selectedCity');
+                const showtime = localStorage.getItem('selectedShowtime');
+
+                document.getElementById('bookingInfo').innerHTML = `
+                <div style="margin-top: 1rem; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 10px;">
+                    <h3>${movieId}</h3>
+                    <p>${city.charAt(0).toUpperCase() + city.slice(1)} | ${showtime}</p>
+                </div>
+            `;
+            }
+
+            function renderSeats() {
+                const seatsContainer = document.getElementById('seatsContainer');
+                seatsContainer.innerHTML = '';
+
+                for (let i = 0; i < 48; i++) {
+                    const seat = document.createElement('div');
+                    seat.className = 'seat';
+                    if (Math.random() < 0.3) {
+                        seat.classList.add('occupied');
+                        seat.innerHTML = '<i class="fas fa-times"></i>';
+                    }
+                    seat.addEventListener('click', () => toggleSeat(seat));
+                    seatsContainer.appendChild(seat);
+                }
+            }
+
+            function toggleSeat(seat) {
+                if (seat.classList.contains('occupied')) return;
+
+                seat.classList.toggle('selected');
+                updateBookingSummary();
+            }
+
+            function updateBookingSummary() {
+                const selectedSeatsCount = document.querySelectorAll('.seat.selected').length;
+                const subtotal = selectedSeatsCount * TICKET_PRICE;
+                const discount = subtotal * 0.1;
+                const totalPrice = subtotal - discount;
+
+                document.getElementById('selectedSeatsCount').textContent = selectedSeatsCount;
+                document.getElementById('subtotalPrice').textContent = `₹${subtotal}`;
+                document.getElementById('discount').textContent = `-₹${discount}`;
+                document.getElementById('totalPrice').textContent = `₹${totalPrice}`;
+
+                const proceedBtn = document.getElementById('proceedBtn');
+                proceedBtn.disabled = selectedSeatsCount === 0;
+            }
+
+            function showPaymentForm() {
+                const selectedSeatsElements = document.querySelectorAll('.seat.selected');
+                if (selectedSeatsElements.length === 0) return;
+
+                // Get the indices of selected seats
+                const selectedSeatsArray = Array.from(selectedSeatsElements).map((seat, index) => {
+                    // Get all seats to find index of selected ones
+                    const allSeats = Array.from(document.querySelectorAll('.seat'));
+                    return allSeats.indexOf(seat);
+                });
+
+                // Calculate prices
+                const subtotal = selectedSeatsElements.length * TICKET_PRICE;
+                const discount = subtotal * 0.1;
+                const totalPrice = subtotal - discount;
+
+                // Store complete booking details in localStorage
+                localStorage.setItem('selectedSeats', JSON.stringify(selectedSeatsArray));
+                localStorage.setItem('totalAmount', totalPrice.toString());
+
+                // Redirect directly to payment page
+                window.location.href = 'payment.html';
+            }
+
+            window.onload = checkBookingFlow;
+        </script>
+</body>
+
+</html>

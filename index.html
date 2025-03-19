@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieBuzz</title>
+    <script src="./js/cities.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            min-height: 100vh;
+            color: white;
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .header {
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 1rem auto;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .search-container {
+            margin: 2rem 0;
+        }
+
+        .search-input {
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border-radius: 25px;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+            width: 400px;
+            max-width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .cities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .city-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .city-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+        }
+
+        .city-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .city-info {
+            padding: 0.5rem;
+        }
+
+        .city-name {
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .city-details {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .error-msg {
+            color: #ff4444;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            display: none;
+        }
+
+        /* Mobile Styles for Index Page */
+        @media screen and (max-width: 768px) {
+            .header {
+                padding: 0.5rem;
+            }
+
+            .logo {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 0.5rem;
+                margin: 1rem auto;
+            }
+
+            .search-container {
+                margin: 1rem 0;
+            }
+
+            .search-input {
+                width: 90%;
+                padding: 0.8rem;
+                font-size: 1rem;
+            }
+
+            .cities-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1rem;
+                padding: 0 1rem;
+            }
+
+            .city-card {
+                margin: 0.5rem 0;
+            }
+
+            .city-image {
+                height: 150px;
+            }
+
+            .city-info {
+                padding: 0.8rem;
+            }
+
+            .city-name {
+                font-size: 1.2rem;
+            }
+
+            .city-details {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <h1 class="logo">MovieBuzz</h1>
+    </header>
+
+    <div class="container">
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Search for your city..." id="citySearch"
+                onkeyup="filterCities()">
+        </div>
+        <div id="citiesGrid" class="cities-grid"></div>
+        <div id="errorMsg" class="error-msg">
+            No cities found matching your search
+        </div>
+    </div>
+
+    <script>
+
+        function renderCities(citiesToRender) {
+            const citiesGrid = document.getElementById('citiesGrid');
+            citiesGrid.innerHTML = citiesToRender.map(city => `
+                <div class="city-card" onclick="selectCity('${city.value}')">
+                    <img src="${city.image}" alt="${city.name}" class="city-image">
+                    <div class="city-info">
+                        <h3 class="city-name">${city.name}</h3>
+                        <p class="city-details">${city.details}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterCities() {
+            const searchTerm = document.getElementById('citySearch').value.toLowerCase();
+            const filteredCities = cities.filter(city =>
+                city.name.toLowerCase().includes(searchTerm) ||
+                city.details.toLowerCase().includes(searchTerm)
+            );
+
+            const errorMsg = document.getElementById('errorMsg');
+            if (filteredCities.length === 0) {
+                errorMsg.style.display = 'block';
+            } else {
+                errorMsg.style.display = 'none';
+            }
+
+            renderCities(filteredCities);
+        }
+
+        function selectCity(city) {
+            localStorage.setItem('selectedCity', city);
+            window.location.href = 'movies.html';
+        }
+
+        // Initial render
+        window.onload = function () {
+            renderCities(cities);
+        }
+    </script>
+</body>
+
+</html>

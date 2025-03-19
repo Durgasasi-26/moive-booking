@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieBuzz</title>
+    <script src="./js/movies.js"></script>
+    <script src="./js/theatres.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            min-height: 100vh;
+            color: white;
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .header {
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        /* Same base styles */
+        .theatre-list {
+            max-width: 800px;
+            margin: 2rem auto;
+        }
+
+        .theatre-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theatre-card:hover {
+            transform: translateX(10px);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .theatre-name {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .showtimes {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .showtime {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .showtime:hover {
+            background: rgba(76, 175, 80, 0.5);
+        }
+
+        .movie-info {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .trailer-button {
+            background: #ff0000;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+        }
+
+        .trailer-button:hover {
+            background: #cc0000;
+            transform: scale(1.05);
+        }
+
+        /* Mobile Styles for Theatres Page */
+        @media screen and (max-width: 768px) {
+            .header {
+                padding: 0.5rem;
+            }
+
+            .logo {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 0.5rem;
+            }
+
+            .movie-info {
+                padding: 0.8rem;
+                margin: 0.5rem;
+            }
+
+            .movie-info img {
+                width: 60px;
+                height: 90px;
+            }
+
+            .theatre-list {
+                padding: 0 0.5rem;
+            }
+
+            .theatre-card {
+                padding: 0.8rem;
+                margin-bottom: 0.8rem;
+            }
+
+            .theatre-name {
+                font-size: 1.1rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .showtimes {
+                gap: 0.5rem;
+            }
+
+            .showtime {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+
+            .trailer-button {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <h1 class="logo">MovieBuzz</h1>
+    </header>
+
+    <div class="container">
+        <div class="movie-info" id="movieInfo"></div>
+        <div class="theatre-list" id="theatreList"></div>
+    </div>
+
+    <script>
+
+        window.onload = function () {
+            const city = localStorage.getItem('selectedCity');
+            const movieId = localStorage.getItem('selectedMovie');
+
+            if (!city || !movieId) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            if (!theatres[city]) {
+                alert('No theatres available in selected city');
+                window.location.href = 'movies.html';
+                return;
+            }
+
+            displayTheatres(city);
+            displayMovieInfo(movieId);
+        }
+
+        function displayTheatres(city) {
+            const theatreList = document.getElementById('theatreList');
+            theatreList.innerHTML = theatres[city].map(theatre => `
+                <div class="theatre-card">
+                    <h3 class="theatre-name">${theatre.name}</h3>
+                    <div class="showtimes">
+                        ${theatre.shows.map(show => `
+                            <div class="showtime" onclick="selectShow('${theatre.id}', '${show}')">
+                                ${show}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectShow(theatreId, showtime) {
+            localStorage.setItem('selectedTheatre', theatreId);
+            localStorage.setItem('selectedShowtime', showtime);
+            window.location.href = 'booking.html';
+        }
+
+        function displayMovieInfo(movieId) {
+            // Get movie details from localStorage
+            const movieTitle = localStorage.getItem('selectedMovie');
+            const moviePoster = localStorage.getItem('selectedMoviePoster');
+            const city = localStorage.getItem('selectedCity');
+
+            // Find the movie object to get the trailer URL
+            const movie = movies.find(m => m.title === movieTitle);
+            const trailerButton = movie?.trailer ?
+                `<button class="trailer-button" onclick="openTrailer('${movie.trailer}')">
+                <i class="fas fa-play"></i> Watch Trailer
+             </button>` : '';
+
+            document.getElementById('movieInfo').innerHTML = `
+            <div style="display: flex; align-items: center; gap: 2rem;">
+                <img src="${moviePoster}" 
+                     alt="${movieTitle}" 
+                     style="width: 100px; height: 150px; object-fit: cover; border-radius: 10px;">
+                <div>
+                    <h2 style="margin-bottom: 0.5rem">${movieTitle}</h2>
+                    <p style="margin-bottom: 0.5rem">${city.charAt(0).toUpperCase() + city.slice(1)}</p>
+                    <p style="margin-bottom: 1rem; font-size: 0.9em; color: #a8a8a8;">Select your preferred showtime below</p>
+                    ${trailerButton}
+                </div>
+            </div>
+        `;
+        }
+
+        function openTrailer(trailerUrl) {
+            window.open(trailerUrl, '_blank');
+        }
+    </script>
+</body>
+
+</html>
